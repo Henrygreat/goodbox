@@ -101,12 +101,12 @@ export default function Attendance() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Attendance</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Attendance</h1>
       </div>
 
       {/* Controls */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
             <input
@@ -131,13 +131,13 @@ export default function Attendance() {
           <div className="flex items-end gap-2">
             <button
               onClick={markAllPresent}
-              className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 text-sm"
             >
               All Present
             </button>
             <button
               onClick={markAllAbsent}
-              className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm"
             >
               All Absent
             </button>
@@ -146,14 +146,14 @@ export default function Attendance() {
             <button
               onClick={saveAttendance}
               disabled={saving || !hasChanges}
-              className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {saving ? 'Saving...' : 'Save Attendance'}
             </button>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center gap-4 text-sm text-gray-600">
+        <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
           <span>Present: <strong className="text-green-600">{presentCount}</strong></span>
           <span>Absent: <strong className="text-red-600">{members.length - presentCount}</strong></span>
           <span>Total: <strong>{members.length}</strong></span>
@@ -162,8 +162,8 @@ export default function Attendance() {
       </div>
 
       {/* Attendance Grid */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+      <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
           {members.map((member) => (
             <button
               key={member.id}

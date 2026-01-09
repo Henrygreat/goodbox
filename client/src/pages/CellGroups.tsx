@@ -90,8 +90,8 @@ export default function CellGroups() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Cell Groups</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Cell Groups</h1>
         {isAdmin && (
           <button
             onClick={() => {
@@ -99,7 +99,7 @@ export default function CellGroups() {
               setFormData({ name: '', description: '', leader_id: '' });
               setShowForm(true);
             }}
-            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-center text-sm sm:text-base"
           >
             + Add Cell Group
           </button>
@@ -108,12 +108,12 @@ export default function CellGroups() {
 
       {/* Add/Edit Form */}
       {showForm && isAdmin && (
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <h2 className="text-lg font-semibold mb-4">
             {editingId ? 'Edit Cell Group' : 'New Cell Group'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Name <span className="text-red-500">*</span>

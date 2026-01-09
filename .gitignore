@@ -1,0 +1,31 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Node modules (should be in individual project folders)
+node_modules
+
+# Build outputs
+dist
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor directories
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker volumes (local development)
+postgres_data

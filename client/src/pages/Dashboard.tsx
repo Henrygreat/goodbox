@@ -65,30 +65,30 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
         <Link
           to="/members/new"
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-center text-sm sm:text-base"
         >
           + Add Member
         </Link>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {statCards.map((card) => (
           <Link
             key={card.label}
             to={card.link}
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
+            className="bg-white rounded-xl shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">{card.label}</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{card.value}</p>
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-gray-500 text-xs sm:text-sm truncate">{card.label}</p>
+                <p className="text-xl sm:text-3xl font-bold text-gray-800 mt-1">{card.value}</p>
               </div>
-              <div className={`${card.color} text-white p-3 rounded-lg text-2xl`}>
+              <div className={`${card.color} text-white p-2 sm:p-3 rounded-lg text-lg sm:text-2xl flex-shrink-0`}>
                 {card.icon}
               </div>
             </div>
