@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    # server end
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    # client end
+
   # PostgreSQL Database
   db:
     image: postgres:16-alpine
