@@ -1,6 +1,9 @@
 FROM node:20-slim AS build
 WORKDIR /app
 
+# Force devDependencies to be installed (Prisma + TypeScript)
+ENV NODE_ENV=development
+
 COPY package*.json ./
 RUN npm ci
 
