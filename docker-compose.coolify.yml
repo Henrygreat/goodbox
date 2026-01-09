@@ -1,18 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    # server end
-
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    # client end
-
   # PostgreSQL Database
   db:
     image: postgres:16-alpine
@@ -46,12 +34,11 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: >
-      sh -c "npx prisma migrate deploy && node dist/index.js"
+    command: sh -c "npx prisma migrate deploy && node dist/index.js"
     networks:
       - church-network
 
-  # Frontend Client with built-in API proxy
+  # Frontend Client (Nginx serving built files)
   client:
     build:
       context: ./client
