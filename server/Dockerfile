@@ -1,19 +1,11 @@
-FROM node:20-slim AS build
+FROM node:20-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN NODE_ENV=development npm ci
+RUN npm ci
 
 COPY . .
+RUN npm run build
 
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
-
-# IMPORTANT: no npm run build
-RUN node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build
-
-FROM nginx:alpine
-COPY nginx.coolify.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 3001
+CMD ["node", "dist/index.js"]
