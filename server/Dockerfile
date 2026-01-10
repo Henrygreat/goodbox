@@ -2,7 +2,8 @@ FROM node:20-slim AS build
 WORKDIR /app
 
 COPY package*.json ./
-ENV NODE_ENV=development
+RUN NODE_ENV=development npm ci
+
 RUN npm ci
 
 COPY . .
