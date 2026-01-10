@@ -1,33 +1,22 @@
-# Build stage
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Force dev deps even if NODE_ENV=production is set by the platform
+ENV RUN NODE_ENV=development npm install
+
 RUN npm ci
 
-# Copy source code
 COPY . .
 
-# Build argument for API URL
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
-# Build the application
-RUN npm run build
+RUN node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build
 
-# Production stage - serve with nginx
-FROM nginx:alpine
-
-# Copy custom nginx config
+FROM nginx:slim
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy built files from build stage
 COPY --from=build /app/dist /usr/share/nginx/html
-
-# Expose port 80
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
