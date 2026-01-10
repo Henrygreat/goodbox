@@ -30,7 +30,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3001
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
-      NODE_ENV: production
+      #NODE_ENV: production
     depends_on:
       db:
         condition: service_healthy

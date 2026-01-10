@@ -4,20 +4,16 @@ WORKDIR /app
 COPY package*.json ./
 RUN NODE_ENV=development npm ci
 
-RUN npm ci
-
 COPY . .
-RUN npx prisma generate
-RUN npm run build
 
-FROM node:20-slim
-WORKDIR /app
-ENV NODE_ENV=production
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/prisma ./prisma
+# IMPORTANT: no npm run build
+RUN node ./node_modules/typescript/bin/tsc && node ./node_modules/vite/bin/vite.js build
 
-EXPOSE 3001
-CMD ["node","dist/index.js"]
+FROM nginx:alpine
+COPY nginx.coolify.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
