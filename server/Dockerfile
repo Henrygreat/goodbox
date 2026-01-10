@@ -10,7 +10,7 @@ COPY . .
 RUN node node_modules/prisma/build/index.js generate
 
 # Build TypeScript -> dist/
-RUN npm run build
+RUN npm run build || (echo "==== BUILD FAILED: showing tsconfig + file tree ====" && ls -la && ls -la src && cat tsconfig.json && exit 1)
 
 EXPOSE 3001
 CMD ["node", "dist/index.js"]
