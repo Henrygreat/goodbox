@@ -30,7 +30,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: >
+    #command: >
       sh -c "node node_modules/prisma/build/index.js migrate deploy && node dist/index.js"
 
   client:
