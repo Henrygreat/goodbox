@@ -35,7 +35,11 @@ services:
     expose:
       - "3001"
     networks:
-      - church-network
+  church-network:
+    driver: bridge
+  coolify:
+    external: true
+    name: coolify
 
   client:
     build:
