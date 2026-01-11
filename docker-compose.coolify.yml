@@ -40,9 +40,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
-      - "traefik.http.routers.server.rule=Host(`backend.loveworldtelford.org`)"
-      - "traefik.http.routers.server.entrypoints=http,https"
-      - "traefik.http.services.server.loadbalancer.server.port=3001"
+      - "traefik.http.routers.churchcrm-server.rule=Host(`backend.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-server.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-server.priority=100"
+      - "traefik.http.routers.churchcrm-server.service=churchcrm-server"
+      - "traefik.http.services.churchcrm-server.loadbalancer.server.port=3001"
 
   client:
     build:
@@ -61,9 +63,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
-      - "traefik.http.routers.client.rule=Host(`deon.loveworldtelford.org`)"
-      - "traefik.http.routers.client.entrypoints=http,https"
-      - "traefik.http.services.client.loadbalancer.server.port=80"
+      - "traefik.http.routers.churchcrm-client.rule=Host(`deon.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-client.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-client.priority=10"
+      - "traefik.http.routers.churchcrm-client.service=churchcrm-client"
+      - "traefik.http.services.churchcrm-client.loadbalancer.server.port=80"
 
 volumes:
   postgres_data:
