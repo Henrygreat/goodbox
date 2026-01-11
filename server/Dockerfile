@@ -4,6 +4,9 @@ WORKDIR /app
 # Ensure devDependencies are available for TypeScript build
 ENV NODE_ENV=development
 
+# Install openssl for Prisma
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 RUN npm ci
 
