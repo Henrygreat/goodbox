@@ -28,10 +28,11 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3001
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      NODE_ENV: production
     depends_on:
       db:
         condition: service_healthy
-    command: sh -c "node node_modules/prisma/build/index.js migrate deploy && node dist/index.js"
+    command: sh -c "npx prisma migrate deploy && node dist/index.js"
     expose:
       - "3001"
     networks:
@@ -40,10 +41,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
+
       - "traefik.http.routers.churchcrm-server.rule=Host(`backend.loveworldtelford.org`)"
       - "traefik.http.routers.churchcrm-server.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-server.tls=true"
       - "traefik.http.routers.churchcrm-server.priority=100"
-      - "traefik.http.routers.churchcrm-server.service=churchcrm-server"
+
       - "traefik.http.services.churchcrm-server.loadbalancer.server.port=3001"
 
   client:
@@ -63,10 +66,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
+
       - "traefik.http.routers.churchcrm-client.rule=Host(`deon.loveworldtelford.org`)"
       - "traefik.http.routers.churchcrm-client.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-client.tls=true"
       - "traefik.http.routers.churchcrm-client.priority=10"
-      - "traefik.http.routers.churchcrm-client.service=churchcrm-client"
+
       - "traefik.http.services.churchcrm-client.loadbalancer.server.port=80"
 
 volumes:
