@@ -122,3 +122,30 @@ export interface CreateCellGroupRequest {
   description?: string;
   leader_id?: number;
 }
+
+// V2 Types - Import
+export type ImportStatus = 'pending' | 'parsed' | 'committed' | 'failed';
+
+export interface ImportedMember {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  birthday?: string;
+  maritalStatus?: 'single' | 'married' | 'undisclosed';
+  status?: 'pending_approval' | 'active' | 'inactive';
+  cellGroupName?: string;
+  broughtBy?: string;
+  notes?: string;
+}
+
+export interface ImportParseError {
+  rowIndex: number;
+  issues: string[];
+}
+
+export interface ImportParseResult {
+  rows: ImportedMember[];
+  errors: ImportParseError[];
+}

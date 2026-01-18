@@ -114,3 +114,64 @@ export interface AuthResponse {
   token: string;
   user: User;
 }
+
+// Import types
+export type ImportStatus = 'pending' | 'parsed' | 'committed' | 'failed';
+
+export interface ImportedMember {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  birthday?: string;
+  maritalStatus?: 'single' | 'married' | 'undisclosed';
+  status?: 'pending_approval' | 'active' | 'inactive';
+  cellGroupName?: string;
+  broughtBy?: string;
+  notes?: string;
+}
+
+export interface DuplicateInfo {
+  isMatch: boolean;
+  matchedMemberId?: number;
+  matchType?: 'email' | 'phone' | 'name_birthday';
+  matchedMemberName?: string;
+}
+
+export interface ImportedMemberWithDuplicate extends ImportedMember {
+  duplicateInfo?: DuplicateInfo;
+}
+
+export interface ImportParseError {
+  rowIndex: number;
+  issues: string[];
+}
+
+export interface ImportRecord {
+  id: number;
+  filename: string;
+  fileType: string;
+  status: ImportStatus;
+  rowCount: number | null;
+  createdAt: string;
+}
+
+export interface ImportParseResult {
+  importId: number;
+  filename: string;
+  rows: ImportedMemberWithDuplicate[];
+  errors: ImportParseError[];
+}
+
+export interface ImportCommitOptions {
+  rows?: ImportedMember[];
+  skippedIndices?: number[];
+}
+
+export interface ImportCommitResult {
+  created: number;
+  updated: number;
+  skipped: number;
+  errors: string[];
+}

@@ -67,12 +67,14 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
 
   // Relations
-  ledCellGroups     CellGroup[]        @relation("CellGroupLeader")
-  assignedMembers   Member[]           @relation("AssignedLeader")
-  followUps         FollowUp[]
-  notifications     Notification[]
-  requestedApprovals PendingApproval[] @relation("RequestedBy")
-  reviewedApprovals  PendingApproval[] @relation("ReviewedBy")
+  ledCellGroups       CellGroup[]            @relation("CellGroupLeader")
+  assignedMembers     Member[]               @relation("AssignedLeader")
+  followUps           FollowUp[]
+  notifications       Notification[]
+  requestedApprovals  PendingApproval[]      @relation("RequestedBy")
+  reviewedApprovals   PendingApproval[]      @relation("ReviewedBy")
+  passwordResetTokens PasswordResetToken[]
+  imports             Import[]
 
   @@map("users")
 }
@@ -183,4 +185,53 @@ model PendingApproval {
   reviewer    User?    @relation("ReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
 
   @@map("pending_approvals")
+}
+
+// =====================================================
+// V2 Models - Password Reset & Import
+// =====================================================
+
+model PasswordResetToken {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
+enum ImportStatus {
+  pending
+  parsed
+  committed
+  failed
+}
+
+model Import {
+  id         Int          @id @default(autoincrement())
+  filename   String
+  filePath   String       @map("file_path")
+  fileType   String       @map("file_type")
+  status     ImportStatus @default(pending)
+  rowCount   Int?         @map("row_count")
+  createdBy  Int          @map("created_by")
+  parsedData Json?        @map("parsed_data")
+  errors     Json?
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@index([createdBy])
+  @@index([status])
+  @@map("imports")
 }

@@ -11,6 +11,8 @@ import attendanceRoutes from "./routes/attendance";
 import approvalsRoutes from "./routes/approvals";
 import notificationsRoutes from "./routes/notifications";
 import reportsRoutes from "./routes/reports";
+import passwordRoutes from "./routes/password";
+import importsRoutes from "./routes/imports";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -39,6 +41,8 @@ app.use(express.json());
 
 // API routes
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", passwordRoutes);
+app.use("/api/admin", passwordRoutes);
 app.use("/api/members", membersRoutes);
 app.use("/api/followups", followupsRoutes);
 app.use("/api/cellgroups", cellgroupsRoutes);
@@ -46,6 +50,7 @@ app.use("/api/attendance", attendanceRoutes);
 app.use("/api/approvals", approvalsRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/reports", reportsRoutes);
+app.use("/api/imports", importsRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import type {
   User, Member, CellGroup, FollowUp, Attendance,
-  Notification, PendingApproval, DashboardStats, AuthResponse
+  Notification, PendingApproval, DashboardStats, AuthResponse,
+  ImportRecord, ImportParseResult, ImportCommitResult, ImportCommitOptions
 } from '../types';
 
 const api = axios.create({
@@ -125,6 +126,39 @@ export const reportsApi = {
   getCellGroupHealth: () => api.get('/reports/cell-group-health'),
   getNewMembersTrend: (months?: number) => api.get('/reports/new-members-trend', { params: { months } }),
   getFoundationSchool: () => api.get('/reports/foundation-school')
+};
+
+// Password management
+export const passwordApi = {
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<{ message: string }>('/auth/change-password', { currentPassword, newPassword }),
+  forgotPassword: (email: string) =>
+    api.post<{ message: string }>('/auth/forgot-password', { email }),
+  resetPassword: (token: string, newPassword: string) =>
+    api.post<{ message: string }>('/auth/reset-password', { token, newPassword }),
+  adminResetPassword: (userId: number) =>
+    api.post<{ message: string; emailSent: boolean; note?: string }>(`/admin/users/${userId}/reset-password`)
+};
+
+// Imports
+export const importsApi = {
+  upload: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post<{ importId: number; filename: string }>('/imports/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  parse: (importId: number, checkDuplicates: boolean = true) =>
+    api.post<ImportParseResult>(`/imports/${importId}/parse?checkDuplicates=${checkDuplicates}`),
+  commit: (importId: number, options?: ImportCommitOptions) =>
+    api.post<ImportCommitResult>(`/imports/${importId}/commit`, options),
+  getStatus: (importId: number) =>
+    api.get<ImportRecord>(`/imports/${importId}`),
+  list: () =>
+    api.get<ImportRecord[]>('/imports'),
+  downloadTemplate: () =>
+    api.get('/imports/template', { responseType: 'blob' })
 };
 
 export default api;

@@ -5,6 +5,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 // Pages
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Members from './pages/Members';
 import MemberDetail from './pages/MemberDetail';
@@ -16,6 +18,8 @@ import Approvals from './pages/Approvals';
 import Notifications from './pages/Notifications';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
+import ChangePassword from './pages/ChangePassword';
+import ImportMembers from './pages/ImportMembers';
 
 function App() {
   return (
@@ -23,6 +27,8 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected Routes */}
           <Route
@@ -152,6 +158,28 @@ function App() {
               <ProtectedRoute adminOnly>
                 <Layout>
                   <Users />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/change-password"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ChangePassword />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/import-members"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ImportMembers />
                 </Layout>
               </ProtectedRoute>
             }
