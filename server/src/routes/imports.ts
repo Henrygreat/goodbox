@@ -124,6 +124,18 @@ function normalizeColumnName(name: string): keyof ImportedMember | null {
   return columnMappings[normalized] || null;
 }
 
+// ---- FIX HELPERS (prevents assigning undefined to required string fields) ----
+function asTrimmedString(value: any): string {
+  return String(value ?? '').trim();
+}
+
+function setOptionalString(obj: ImportedMember, key: keyof ImportedMember, value: any) {
+  const v = asTrimmedString(value);
+  if (v !== '') {
+    (obj as any)[key] = v;
+  }
+}
+
 function parseDate(value: any): string | undefined {
   if (!value) return undefined;
 
@@ -219,16 +231,23 @@ function parseExcelOrCsv(filePath: string): ParseResult {
       const value = row[originalCol];
 
       switch (mappedField) {
-        case 'firstName':
-        case 'lastName':
+        case 'firstName': {
+          member.firstName = asTrimmedString(value);
+          break;
+        }
+        case 'lastName': {
+          member.lastName = asTrimmedString(value);
+          break;
+        }
         case 'email':
         case 'phone':
         case 'address':
         case 'cellGroupName':
         case 'broughtBy':
-        case 'notes':
-          member[mappedField] = value ? String(value).trim() : undefined;
+        case 'notes': {
+          setOptionalString(member, mappedField, value);
           break;
+        }
         case 'birthday':
           member.birthday = parseDate(value);
           break;
@@ -329,21 +348,30 @@ function parseTextToMembers(text: string): ParseResult {
 
         switch (field) {
           case 'firstName':
+            member.firstName = asTrimmedString(value);
+            break;
+
           case 'lastName':
+            member.lastName = asTrimmedString(value);
+            break;
+
           case 'email':
           case 'phone':
           case 'address':
           case 'cellGroupName':
           case 'broughtBy':
           case 'notes':
-            member[field] = value || undefined;
+            setOptionalString(member, field, value);
             break;
+
           case 'birthday':
             member.birthday = parseDate(value);
             break;
+
           case 'maritalStatus':
             member.maritalStatus = normalizeMaritalStatus(value);
             break;
+
           case 'status':
             member.status = normalizeMemberStatus(value);
             break;
@@ -484,7 +512,7 @@ router.get(
         'Birthday': '1985-12-20',
         'Marital Status': 'single',
         'Status': 'pending_approval',
-        'Cell Group': 'Women\'s Group',
+        'Cell Group': "Women's Group",
         'Brought By': '',
         'Notes': ''
       }
@@ -681,17 +709,19 @@ router.post(
 
       try {
         // Find existing member by priority: email > phone > name+birthday
-        let existingMember = null;
+        let existingMember: { id: number } | null = null;
 
         if (row.email) {
           existingMember = await prisma.member.findFirst({
-            where: { email: row.email }
+            where: { email: row.email },
+            select: { id: true }
           });
         }
 
         if (!existingMember && row.phone) {
           existingMember = await prisma.member.findFirst({
-            where: { phone: row.phone }
+            where: { phone: row.phone },
+            select: { id: true }
           });
         }
 
@@ -701,7 +731,8 @@ router.post(
               firstName: row.firstName,
               lastName: row.lastName,
               birthday: new Date(row.birthday)
-            }
+            },
+            select: { id: true }
           });
         }
 
