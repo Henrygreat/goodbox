@@ -42,12 +42,15 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
 
-      - "traefik.http.routers.churchcrm-server.rule=Host(`v2.backend.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-server.entrypoints=http,https"
-      - "traefik.http.routers.churchcrm-server.tls=true"
-      - "traefik.http.routers.churchcrm-server.priority=100"
+      # v2 backend router (UNIQUE NAME)
+      - "traefik.http.routers.churchcrm-v2-server.rule=Host(`v2.backend.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-v2-server.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-v2-server.tls=true"
+      - "traefik.http.routers.churchcrm-v2-server.priority=100"
+      - "traefik.http.routers.churchcrm-v2-server.service=churchcrm-v2-server"
 
-      - "traefik.http.services.churchcrm-server.loadbalancer.server.port=3001"
+      # v2 backend service -> container port
+      - "traefik.http.services.churchcrm-v2-server.loadbalancer.server.port=3001"
 
   client:
     build:
@@ -67,12 +70,15 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
 
-      - "traefik.http.routers.churchcrm-client.rule=Host(`v2.deon.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-client.entrypoints=http,https"
-      - "traefik.http.routers.churchcrm-client.tls=true"
-      - "traefik.http.routers.churchcrm-client.priority=10"
+      # v2 frontend router (UNIQUE NAME)
+      - "traefik.http.routers.churchcrm-v2-client.rule=Host(`v2.deon.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-v2-client.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-v2-client.tls=true"
+      - "traefik.http.routers.churchcrm-v2-client.priority=10"
+      - "traefik.http.routers.churchcrm-v2-client.service=churchcrm-v2-client"
 
-      - "traefik.http.services.churchcrm-client.loadbalancer.server.port=80"
+      # v2 frontend service -> container port
+      - "traefik.http.services.churchcrm-v2-client.loadbalancer.server.port=80"
 
 volumes:
   postgres_data:
