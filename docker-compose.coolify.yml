@@ -43,7 +43,7 @@ services:
       - "traefik.docker.network=coolify"
 
       - "traefik.http.routers.churchcrm-server.rule=Host(`v2.backend.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-server.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-server.entrypoints=web,websecure"
       - "traefik.http.routers.churchcrm-server.tls=true"
       - "traefik.http.routers.churchcrm-server.priority=100"
 
@@ -68,7 +68,7 @@ services:
       - "traefik.docker.network=coolify"
 
       - "traefik.http.routers.churchcrm-client.rule=Host(`v2.deon.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-client.entrypoints=http,https"
+      - "traefik.http.routers.churchcrm-client.entrypoints=web,websecure"
       - "traefik.http.routers.churchcrm-client.tls=true"
       - "traefik.http.routers.churchcrm-client.priority=10"
 
