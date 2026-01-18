@@ -1,17 +1,21 @@
-FROM node:20-bookworm-slim
+FROM node:20-alpine
 
 WORKDIR /app
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends openssl ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
+# Prisma needs openssl
+RUN apk add --no-cache openssl1.1-compat ca-certificates
 
 COPY package*.json ./
-RUN npm ci
+
+# IMPORTANT: install dev deps so TypeScript build works
+ENV NODE_ENV=development
+RUN npm ci --include=dev
 
 COPY . .
 
 RUN npx prisma generate
+
+# Compile TS -> dist
 RUN npm run build
 
 EXPOSE 3001
