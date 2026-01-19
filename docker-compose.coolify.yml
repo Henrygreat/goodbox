@@ -42,13 +42,17 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
 
-      - "traefik.http.routers.churchcrm-v2-server.rule=Host(v2.backend.loveworldtelford.org)"
-      - "traefik.http.routers.churchcrm-v2-server.entrypoints=web,websecure"
-      - "traefik.http.routers.churchcrm-v2-server.tls=true"
-      - "traefik.http.routers.churchcrm-v2-server.priority=100"
-      - "traefik.http.routers.churchcrm-v2-server.service=churchcrm-v2-server"
+      # ===== BACKEND (HTTPS) =====
+      - "traefik.http.routers.churchcrm-server.rule=Host(`backend.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-server.entrypoints=websecure"
+      - "traefik.http.routers.churchcrm-server.tls=true"
+      - "traefik.http.routers.churchcrm-server.service=churchcrm-server"
+      - "traefik.http.services.churchcrm-server.loadbalancer.server.port=3001"
 
-      - "traefik.http.services.churchcrm-v2-server.loadbalancer.server.port=3001"
+      # ===== BACKEND (HTTP -> HTTPS redirect) =====
+      - "traefik.http.routers.churchcrm-server-http.rule=Host(`backend.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-server-http.entrypoints=web"
+      - "traefik.http.routers.churchcrm-server-http.middlewares=redirect-to-https@docker"
 
   client:
     build:
@@ -68,13 +72,20 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
 
-      - "traefik.http.routers.churchcrm-v2-client.rule=Host(v2.deon.loveworldtelford.org)"
-      - "traefik.http.routers.churchcrm-v2-client.entrypoints=web,websecure"
-      - "traefik.http.routers.churchcrm-v2-client.tls=true"
-      - "traefik.http.routers.churchcrm-v2-client.priority=10"
-      - "traefik.http.routers.churchcrm-v2-client.service=churchcrm-v2-client"
+      # ===== FRONTEND (HTTPS) =====
+      - "traefik.http.routers.churchcrm-client.rule=Host(`deon.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-client.entrypoints=websecure"
+      - "traefik.http.routers.churchcrm-client.tls=true"
+      - "traefik.http.routers.churchcrm-client.service=churchcrm-client"
+      - "traefik.http.services.churchcrm-client.loadbalancer.server.port=80"
 
-      - "traefik.http.services.churchcrm-v2-client.loadbalancer.server.port=80"
+      # ===== FRONTEND (HTTP -> HTTPS redirect) =====
+      - "traefik.http.routers.churchcrm-client-http.rule=Host(`deon.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-client-http.entrypoints=web"
+      - "traefik.http.routers.churchcrm-client-http.middlewares=redirect-to-https@docker"
+
+      # ===== Middleware definition (shared) =====
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 volumes:
   postgres_data:
