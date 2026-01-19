@@ -23,7 +23,19 @@ export default function Members() {
   // Prevent older async responses from overwriting newer state
   const requestIdRef = useRef(0);
 
-  // 1) Load cell groups ONCE (or when you explicitly want)
+  // --- Helpers: support snake_case OR camelCase from API ---
+  const getFirstName = (m: any) => m.first_name ?? m.firstName ?? "";
+  const getLastName = (m: any) => m.last_name ?? m.lastName ?? "";
+  const getEmail = (m: any) => m.email ?? "";
+  const getPhone = (m: any) => m.phone ?? "";
+  const getCellGroupName = (m: any) =>
+    m.cell_group_name ?? m.cellGroupName ?? m.cellGroup?.name ?? "";
+
+  const getBirthday = (m: any) => m.birthday ?? null;
+  const getLastFollowUp = (m: any) =>
+    m.last_follow_up ?? m.lastFollowUp ?? null;
+
+  // 1) Load cell groups ONCE
   const loadCellGroups = useCallback(async () => {
     try {
       const res = await cellgroupsApi.getAll();
@@ -48,7 +60,6 @@ export default function Members() {
         journey_status: journeyFilter || undefined,
       });
 
-      // Only apply if this is the latest request
       if (myRequestId === requestIdRef.current) {
         setMembers(res.data);
       }
@@ -63,7 +74,6 @@ export default function Members() {
   }, [statusFilter, cellGroupFilter, journeyFilter]);
 
   useEffect(() => {
-    // initial load
     (async () => {
       await loadCellGroups();
       await loadMembers();
@@ -71,7 +81,6 @@ export default function Members() {
   }, [loadCellGroups, loadMembers]);
 
   useEffect(() => {
-    // filters changed -> reload members only
     loadMembers();
   }, [statusFilter, cellGroupFilter, journeyFilter, loadMembers]);
 
@@ -79,12 +88,17 @@ export default function Members() {
     if (!search) return members;
     const searchLower = search.toLowerCase();
 
-    return members.filter((member) => {
+    return members.filter((member: any) => {
+      const first = getFirstName(member).toLowerCase();
+      const last = getLastName(member).toLowerCase();
+      const email = getEmail(member).toLowerCase();
+      const phone = getPhone(member);
+
       return (
-        member.first_name.toLowerCase().includes(searchLower) ||
-        member.last_name.toLowerCase().includes(searchLower) ||
-        member.email?.toLowerCase().includes(searchLower) ||
-        member.phone?.includes(search)
+        first.includes(searchLower) ||
+        last.includes(searchLower) ||
+        email.includes(searchLower) ||
+        phone.includes(search)
       );
     });
   }, [members, search]);
@@ -219,7 +233,7 @@ export default function Members() {
         <>
           {/* Mobile Card View */}
           <div className="md:hidden space-y-3">
-            {filteredMembers.map((member) => (
+            {filteredMembers.map((member: any) => (
               <Link
                 key={member.id}
                 to={`/members/${member.id}`}
@@ -228,14 +242,14 @@ export default function Members() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="font-medium text-gray-900">
-                      {member.first_name} {member.last_name}
+                      {getFirstName(member)} {getLastName(member)}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">
-                      {member.phone || member.email || "No contact"}
+                      {getPhone(member) || getEmail(member) || "No contact"}
                     </div>
-                    {member.cell_group_name && (
+                    {getCellGroupName(member) && (
                       <div className="text-xs text-gray-400 mt-1">
-                        {member.cell_group_name}
+                        {getCellGroupName(member)}
                       </div>
                     )}
                   </div>
@@ -246,19 +260,16 @@ export default function Members() {
                 </div>
                 <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
                   <span>
-                    {member.birthday &&
-                      `🎂 ${new Date(member.birthday).toLocaleDateString(
+                    {getBirthday(member) &&
+                      `🎂 ${new Date(getBirthday(member)).toLocaleDateString(
                         "en-US",
-                        {
-                          month: "short",
-                          day: "numeric",
-                        },
+                        { month: "short", day: "numeric" },
                       )}`}
                   </span>
                   <span>
                     Follow-up:{" "}
-                    {member.last_follow_up
-                      ? new Date(member.last_follow_up).toLocaleDateString()
+                    {getLastFollowUp(member)
+                      ? new Date(getLastFollowUp(member)).toLocaleDateString()
                       : "Never"}
                   </span>
                 </div>
@@ -292,8 +303,9 @@ export default function Members() {
                     </th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-200">
-                  {filteredMembers.map((member) => (
+                  {filteredMembers.map((member: any) => (
                     <tr key={member.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <Link
@@ -301,42 +313,46 @@ export default function Members() {
                           className="hover:text-primary-600"
                         >
                           <div className="font-medium text-gray-900">
-                            {member.first_name} {member.last_name}
+                            {getFirstName(member)} {getLastName(member)}
                           </div>
-                          {member.birthday && (
+                          {getBirthday(member) && (
                             <div className="text-sm text-gray-500">
                               🎂{" "}
-                              {new Date(member.birthday).toLocaleDateString(
+                              {new Date(getBirthday(member)).toLocaleDateString(
                                 "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                },
+                                { month: "short", day: "numeric" },
                               )}
                             </div>
                           )}
                         </Link>
                       </td>
+
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
-                          {member.phone || "-"}
+                          {getPhone(member) || "-"}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {member.email || "-"}
+                          {getEmail(member) || "-"}
                         </div>
                       </td>
+
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {member.cell_group_name || "-"}
+                        {getCellGroupName(member) || "-"}
                       </td>
+
                       <td className="px-6 py-4">
                         {getStatusBadge(member.status)}
                       </td>
+
                       <td className="px-6 py-4">
                         {getJourneyBadge(member.journey_status)}
                       </td>
+
                       <td className="px-6 py-4 text-sm text-gray-500">
-                        {member.last_follow_up
-                          ? new Date(member.last_follow_up).toLocaleDateString()
+                        {getLastFollowUp(member)
+                          ? new Date(
+                              getLastFollowUp(member),
+                            ).toLocaleDateString()
                           : "Never"}
                       </td>
                     </tr>
