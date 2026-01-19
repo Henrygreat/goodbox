@@ -41,8 +41,8 @@ app.use(express.json());
 
 // API routes
 app.use("/api/auth", authRoutes);
-app.use("/api/auth", passwordRoutes);
-app.use("/api/admin", passwordRoutes);
+app.use("/api/auth", passwordRoutes); // ✅ password routes live under /api/auth
+
 app.use("/api/members", membersRoutes);
 app.use("/api/followups", followupsRoutes);
 app.use("/api/cellgroups", cellgroupsRoutes);
@@ -57,10 +57,17 @@ app.get("/api/health", (req, res) => {
 });
 
 // Error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
-});
+app.use(
+  (
+    err: Error,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack);
+    res.status(500).json({ error: "Something went wrong!" });
+  }
+);
 
 async function start() {
   try {
