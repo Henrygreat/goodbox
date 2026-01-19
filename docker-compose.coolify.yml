@@ -29,6 +29,7 @@ services:
       PORT: 3001
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       NODE_ENV: production
+      APP_VERSION: v2
     depends_on:
       db:
         condition: service_healthy
@@ -41,20 +42,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
-
-      # --- v2 BACKEND: HTTPS router ---
-      - "traefik.http.routers.churchcrm-v2-server.rule=Host(`v2.backend.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-v2-server.entrypoints=https"
+      - "traefik.http.routers.churchcrm-v2-server.rule=Host(`backend.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-v2-server.entrypoints=http,https"
       - "traefik.http.routers.churchcrm-v2-server.tls=true"
-      - "traefik.http.routers.churchcrm-v2-server.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.churchcrm-v2-server.priority=100"
       - "traefik.http.routers.churchcrm-v2-server.service=churchcrm-v2-server"
       - "traefik.http.services.churchcrm-v2-server.loadbalancer.server.port=3001"
-      - "traefik.http.services.churchcrm-v2-server.loadbalancer.server.scheme=http"
-
-      # --- v2 BACKEND: HTTP -> HTTPS redirect router ---
-      - "traefik.http.routers.churchcrm-v2-server-http.rule=Host(`v2.backend.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-v2-server-http.entrypoints=http"
-      - "traefik.http.routers.churchcrm-v2-server-http.middlewares=redirect-to-https@docker"
 
   client:
     build:
@@ -73,24 +66,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
-
-      # --- v2 FRONTEND: HTTPS router ---
-      - "traefik.http.routers.churchcrm-v2-client.rule=Host(`v2.deon.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-v2-client.entrypoints=https"
+      - "traefik.http.routers.churchcrm-v2-client.rule=Host(`deon.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-v2-client.entrypoints=http,https"
       - "traefik.http.routers.churchcrm-v2-client.tls=true"
-      - "traefik.http.routers.churchcrm-v2-client.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.churchcrm-v2-client.priority=10"
       - "traefik.http.routers.churchcrm-v2-client.service=churchcrm-v2-client"
       - "traefik.http.services.churchcrm-v2-client.loadbalancer.server.port=80"
-      - "traefik.http.services.churchcrm-v2-client.loadbalancer.server.scheme=http"
-
-      # --- v2 FRONTEND: HTTP -> HTTPS redirect router ---
-      - "traefik.http.routers.churchcrm-v2-client-http.rule=Host(`v2.deon.loveworldtelford.org`)"
-      - "traefik.http.routers.churchcrm-v2-client-http.entrypoints=http"
-      - "traefik.http.routers.churchcrm-v2-client-http.middlewares=redirect-to-https@docker"
-
-      # --- shared redirect middleware (docker-scoped) ---
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
 volumes:
   postgres_data:
