@@ -42,13 +42,12 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
 
-      # v2 backend router
-      - "traefik.http.routers.churchcrm-v2-server.rule=Host(`v2.backend.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-v2-server.rule=Host(v2.backend.loveworldtelford.org)"
       - "traefik.http.routers.churchcrm-v2-server.entrypoints=web,websecure"
       - "traefik.http.routers.churchcrm-v2-server.tls=true"
       - "traefik.http.routers.churchcrm-v2-server.priority=100"
+      - "traefik.http.routers.churchcrm-v2-server.service=churchcrm-v2-server"
 
-      # v2 backend service -> container port
       - "traefik.http.services.churchcrm-v2-server.loadbalancer.server.port=3001"
 
   client:
@@ -69,13 +68,12 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=coolify"
 
-      # v2 frontend router
-      - "traefik.http.routers.churchcrm-v2-client.rule=Host(`v2.deon.loveworldtelford.org`)"
+      - "traefik.http.routers.churchcrm-v2-client.rule=Host(v2.deon.loveworldtelford.org)"
       - "traefik.http.routers.churchcrm-v2-client.entrypoints=web,websecure"
       - "traefik.http.routers.churchcrm-v2-client.tls=true"
       - "traefik.http.routers.churchcrm-v2-client.priority=10"
+      - "traefik.http.routers.churchcrm-v2-client.service=churchcrm-v2-client"
 
-      # v2 frontend service -> container port
       - "traefik.http.services.churchcrm-v2-client.loadbalancer.server.port=80"
 
 volumes:
