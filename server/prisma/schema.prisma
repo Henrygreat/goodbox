@@ -82,10 +82,6 @@ model User {
   role         UserRole
   createdAt    DateTime @default(now()) @map("created_at")
 
-  // ✅ Optional 1-to-1 link to Member (when someone is promoted to user)
-  memberId Int?   @unique @map("member_id")
-  member   Member? @relation("UserMember", fields: [memberId], references: [id], onDelete: SetNull)
-
   // Relations
   ledCellGroups      CellGroup[]       @relation("CellGroupLeader")
   assignedMembers    Member[]          @relation("AssignedLeader")
@@ -99,8 +95,11 @@ model User {
   imports             Import[]
 
   // Rota
-  createdRotas     Rota[]           @relation("RotaCreatedBy")
-  rotaAssignments  RotaAssignment[] @relation("RotaAssignmentUser")
+  createdRotas    Rota[]           @relation("RotaCreatedBy")
+  rotaAssignments RotaAssignment[] @relation("RotaAssignmentUser")
+
+  // ✅ Member profile linked to this user (NO users.member_id column)
+  memberProfile Member?
 
   @@map("users")
 }
@@ -140,8 +139,9 @@ model Member {
   createdAt                 DateTime            @default(now()) @map("created_at")
   updatedAt                 DateTime            @updatedAt @map("updated_at")
 
-  // ✅ opposite of User.member
-  user User? @relation("UserMember")
+  // ✅ Link member -> user (creates members.user_id, NOT users.member_id)
+  userId Int?  @unique @map("user_id")
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   // Relations
   cellGroup        CellGroup?        @relation(fields: [cellGroupId], references: [id], onDelete: SetNull)
