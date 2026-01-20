@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { notificationsApi } from '../services/api';
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { notificationsApi } from "../services/api";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout, isAdmin } = useAuth();
@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setSidebarOpen(false);
   }, [location.pathname]);
 
-  // Close sidebar when clicking outside on mobile
+  // Close sidebar when resizing (mobile vs desktop)
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
@@ -25,13 +25,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }
     };
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   useEffect(() => {
     loadUnreadCount();
-    const interval = setInterval(loadUnreadCount, 60000); // Check every minute
+    const interval = setInterval(loadUnreadCount, 60000); // every minute
     return () => clearInterval(interval);
   }, []);
 
@@ -40,25 +40,36 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       const res = await notificationsApi.getUnreadCount();
       setUnreadCount(res.data.count);
     } catch (error) {
-      console.error('Failed to load notifications count');
+      console.error("Failed to load notifications count");
     }
   };
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: '📊' },
-    { path: '/members', label: 'Members', icon: '👥' },
-    { path: '/import-members', label: 'Import Members', icon: '📥' },
-    { path: '/cell-groups', label: 'Cell Groups', icon: '🏠' },
-    { path: '/attendance', label: 'Attendance', icon: '✓' },
-    ...(isAdmin ? [{ path: '/approvals', label: 'Approvals', icon: '✅' }] : []),
-    { path: '/notifications', label: 'Notifications', icon: '🔔', badge: unreadCount },
-    ...(isAdmin ? [{ path: '/reports', label: 'Reports', icon: '📈' }] : []),
-    ...(isAdmin ? [{ path: '/users', label: 'Cell Leaders', icon: '👤' }] : []),
+    { path: "/", label: "Dashboard", icon: "📊" },
+    { path: "/members", label: "Members", icon: "👥" },
+    { path: "/import-members", label: "Import Members", icon: "📥" },
+    { path: "/cell-groups", label: "Cell Groups", icon: "🏠" },
+    { path: "/attendance", label: "Attendance", icon: "✓" },
+
+    // ✅ ADD ROTA (admin only)
+    ...(isAdmin ? [{ path: "/rota/new", label: "Rota", icon: "📅" }] : []),
+
+    ...(isAdmin
+      ? [{ path: "/approvals", label: "Approvals", icon: "✅" }]
+      : []),
+    {
+      path: "/notifications",
+      label: "Notifications",
+      icon: "🔔",
+      badge: unreadCount,
+    },
+    ...(isAdmin ? [{ path: "/reports", label: "Reports", icon: "📈" }] : []),
+    ...(isAdmin ? [{ path: "/users", label: "Cell Leaders", icon: "👤" }] : []),
   ];
 
   return (
@@ -72,49 +83,101 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className="p-2 hover:bg-primary-600 rounded-lg lg:hidden"
               aria-label="Toggle menu"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 {sidebarOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
             <h1 className="text-lg sm:text-xl font-bold">Church CRM</h1>
           </div>
+
           <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/notifications" className="relative p-2 hover:bg-primary-600 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <Link
+              to="/notifications"
+              className="relative p-2 hover:bg-primary-600 rounded-lg"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
               </svg>
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {unreadCount > 9 ? '9+' : unreadCount}
+                  {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
               )}
             </Link>
+
             <div className="hidden sm:flex items-center gap-2">
               <span className="text-sm">{user?.name}</span>
               <span className="text-xs bg-primary-600 px-2 py-1 rounded">
-                {isAdmin ? 'Admin' : 'Cell Leader'}
+                {isAdmin ? "Admin" : "Cell Leader"}
               </span>
             </div>
+
             <Link
               to="/change-password"
               className="p-2 hover:bg-primary-600 rounded-lg"
               title="Change Password"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                />
               </svg>
             </Link>
+
             <button
               onClick={handleLogout}
               className="p-2 hover:bg-primary-600 rounded-lg"
               title="Logout"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
             </button>
           </div>
@@ -136,7 +199,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             fixed lg:sticky top-14 left-0 h-[calc(100vh-3.5rem)] z-20
             bg-white shadow-lg transition-transform duration-300 ease-in-out
             w-64 lg:translate-x-0
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
         >
           {/* Mobile user info */}
@@ -147,10 +210,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </div>
               <div>
                 <p className="font-medium text-gray-800">{user?.name}</p>
-                <p className="text-xs text-gray-500">{isAdmin ? 'Admin' : 'Cell Leader'}</p>
+                <p className="text-xs text-gray-500">
+                  {isAdmin ? "Admin" : "Cell Leader"}
+                </p>
               </div>
             </div>
           </div>
+
           <nav className="p-4 overflow-y-auto h-full">
             <ul className="space-y-2">
               {navItems.map((item) => (
@@ -159,8 +225,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     to={item.path}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       location.pathname === item.path
-                        ? 'bg-primary-100 text-primary-700'
-                        : 'hover:bg-gray-100 text-gray-700'
+                        ? "bg-primary-100 text-primary-700"
+                        : "hover:bg-gray-100 text-gray-700"
                     }`}
                   >
                     <span>{item.icon}</span>

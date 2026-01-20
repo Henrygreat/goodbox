@@ -21,6 +21,7 @@ import Users from "./pages/Users";
 import ChangePassword from "./pages/ChangePassword";
 import ImportMembers from "./pages/ImportMembers";
 import RotaEditor from "./pages/RotaEditor";
+import RotaList from "./pages/RotaList";
 
 export default function App() {
   return (
@@ -43,7 +44,16 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path="/rota"
+            element={
+              <ProtectedRoute adminOnly>
+                <Layout>
+                  <RotaList />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/members"
             element={
