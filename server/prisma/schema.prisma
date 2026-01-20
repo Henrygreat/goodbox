@@ -82,6 +82,10 @@ model User {
   role         UserRole
   createdAt    DateTime @default(now()) @map("created_at")
 
+  // ✅ Optional 1-to-1 link to Member (when someone is promoted to user)
+  memberId Int?   @unique @map("member_id")
+  member   Member? @relation("UserMember", fields: [memberId], references: [id], onDelete: SetNull)
+
   // Relations
   ledCellGroups      CellGroup[]       @relation("CellGroupLeader")
   assignedMembers    Member[]          @relation("AssignedLeader")
@@ -95,8 +99,8 @@ model User {
   imports             Import[]
 
   // Rota
-  createdRotas        Rota[]            @relation("RotaCreatedBy")
-  rotaAssignments     RotaAssignment[]  @relation("RotaAssignmentUser") // ✅ ADD THIS
+  createdRotas     Rota[]           @relation("RotaCreatedBy")
+  rotaAssignments  RotaAssignment[] @relation("RotaAssignmentUser")
 
   @@map("users")
 }
@@ -135,6 +139,9 @@ model Member {
   notes                     String?
   createdAt                 DateTime            @default(now()) @map("created_at")
   updatedAt                 DateTime            @updatedAt @map("updated_at")
+
+  // ✅ opposite of User.member
+  user User? @relation("UserMember")
 
   // Relations
   cellGroup        CellGroup?        @relation(fields: [cellGroupId], references: [id], onDelete: SetNull)
@@ -302,39 +309,10 @@ model RotaAssignment {
   name   String?
 
   rota Rota  @relation(fields: [rotaId], references: [id], onDelete: Cascade)
-  user User? @relation("RotaAssignmentUser", fields: [userId], references: [id], onDelete: SetNull) // ✅ named relation
+  user User? @relation("RotaAssignmentUser", fields: [userId], references: [id], onDelete: SetNull)
 
   @@unique([rotaId, role])
   @@index([rotaId])
   @@index([userId])
   @@map("rota_assignments")
-}model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  name         String
-  phone        String?
-  role         UserRole
-  createdAt    DateTime @default(now()) @map("created_at")
-
-  // ✅ LINKED MEMBER (optional)
-  member Member?
-
-  // other relations...
-  // ...
-}
-
-model Member {
-  id                        Int                 @id @default(autoincrement())
-  firstName                 String              @map("first_name")
-  lastName                  String              @map("last_name")
-  email                     String?
-  phone                     String?
-  // ...
-
-  // ✅ LINK TO USER (optional, unique)
-  userId Int? @unique @map("user_id")
-  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@map("members")
 }

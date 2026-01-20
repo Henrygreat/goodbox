@@ -54,7 +54,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: /api
+        VITE_API_URL: https://deon.loveworldtelford.org/api
     restart: unless-stopped
     depends_on:
       - server
