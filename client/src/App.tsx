@@ -1,31 +1,33 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Layout from './components/Layout';
-import ProtectedRoute from './components/ProtectedRoute';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
-import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
-import Members from './pages/Members';
-import MemberDetail from './pages/MemberDetail';
-import AddMember from './pages/AddMember';
-import CellGroups from './pages/CellGroups';
-import CellGroupDetail from './pages/CellGroupDetail';
-import Attendance from './pages/Attendance';
-import Approvals from './pages/Approvals';
-import Notifications from './pages/Notifications';
-import Reports from './pages/Reports';
-import Users from './pages/Users';
-import ChangePassword from './pages/ChangePassword';
-import ImportMembers from './pages/ImportMembers';
+import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
+import Members from "./pages/Members";
+import MemberDetail from "./pages/MemberDetail";
+import AddMember from "./pages/AddMember";
+import CellGroups from "./pages/CellGroups";
+import CellGroupDetail from "./pages/CellGroupDetail";
+import Attendance from "./pages/Attendance";
+import Approvals from "./pages/Approvals";
+import Notifications from "./pages/Notifications";
+import Reports from "./pages/Reports";
+import Users from "./pages/Users";
+import ChangePassword from "./pages/ChangePassword";
+import ImportMembers from "./pages/ImportMembers";
+import RotaEditor from "./pages/RotaEditor";
 
-function App() {
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
@@ -131,17 +133,6 @@ function App() {
           />
 
           <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Notifications />
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
             path="/reports"
             element={
               <ProtectedRoute adminOnly>
@@ -158,6 +149,17 @@ function App() {
               <ProtectedRoute adminOnly>
                 <Layout>
                   <Users />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Notifications />
                 </Layout>
               </ProtectedRoute>
             }
@@ -185,12 +187,22 @@ function App() {
             }
           />
 
-          {/* Catch all - redirect to dashboard */}
+          {/* ✅ Admin-only Rota */}
+          <Route
+            path="/rota/new"
+            element={
+              <ProtectedRoute adminOnly>
+                <Layout>
+                  <RotaEditor />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch all */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 }
-
-export default App;

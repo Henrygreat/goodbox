@@ -57,6 +57,22 @@ enum MemberJourneyStatus {
   potential_leader
 }
 
+//
+// ===============================
+// Rota (NEW)
+// ===============================
+//
+enum RotaServiceType {
+  sunday
+  wednesday
+}
+
+enum RotaRole {
+  opening_prayer
+  rhapsody_reading
+  closing_announcements
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
@@ -67,16 +83,20 @@ model User {
   createdAt    DateTime @default(now()) @map("created_at")
 
   // Relations
-  ledCellGroups        CellGroup[]          @relation("CellGroupLeader")
-  assignedMembers      Member[]             @relation("AssignedLeader")
-  followUps            FollowUp[]
-  notifications        Notification[]
-  requestedApprovals   PendingApproval[]    @relation("RequestedBy")
-  reviewedApprovals    PendingApproval[]    @relation("ReviewedBy")
+  ledCellGroups      CellGroup[]       @relation("CellGroupLeader")
+  assignedMembers    Member[]          @relation("AssignedLeader")
+  followUps          FollowUp[]
+  notifications      Notification[]
+  requestedApprovals PendingApproval[] @relation("RequestedBy")
+  reviewedApprovals  PendingApproval[] @relation("ReviewedBy")
 
   // V2
-  passwordResetTokens  PasswordResetToken[]
-  imports              Import[]
+  passwordResetTokens PasswordResetToken[]
+  imports             Import[]
+
+  // Rota
+  createdRotas        Rota[]            @relation("RotaCreatedBy")
+  rotaAssignments     RotaAssignment[]  @relation("RotaAssignmentUser") // ✅ ADD THIS
 
   @@map("users")
 }
@@ -247,4 +267,45 @@ model Import {
   @@index([createdBy])
   @@index([status])
   @@map("imports")
+}
+
+//
+// ===============================
+// Rota Models (NEW)
+// ===============================
+//
+
+model Rota {
+  id          Int             @id @default(autoincrement())
+  serviceDate DateTime        @map("service_date")
+  serviceType RotaServiceType @map("service_type")
+  notes       String?
+  createdById Int             @map("created_by_id")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  createdBy   User            @relation("RotaCreatedBy", fields: [createdById], references: [id], onDelete: Cascade)
+  assignments RotaAssignment[]
+
+  @@unique([serviceDate, serviceType])
+  @@index([serviceDate])
+  @@index([serviceType])
+  @@map("rota")
+}
+
+model RotaAssignment {
+  id     Int      @id @default(autoincrement())
+  rotaId Int      @map("rota_id")
+  role   RotaRole
+  userId Int?     @map("user_id")
+  name   String?
+
+  rota Rota  @relation(fields: [rotaId], references: [id], onDelete: Cascade)
+  user User? @relation("RotaAssignmentUser", fields: [userId], references: [id], onDelete: SetNull) // ✅ named relation
+
+  @@unique([rotaId, role])
+  @@index([rotaId])
+  @@index([userId])
+  @@map("rota_assignments")
 }

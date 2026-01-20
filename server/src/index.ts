@@ -13,6 +13,7 @@ import notificationsRoutes from "./routes/notifications";
 import reportsRoutes from "./routes/reports";
 import passwordRoutes from "./routes/password";
 import importsRoutes from "./routes/imports";
+import rotaRoutes from "./routes/rota";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
@@ -51,6 +52,7 @@ app.use("/api/approvals", approvalsRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/imports", importsRoutes);
+app.use("/api/rota", rotaRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

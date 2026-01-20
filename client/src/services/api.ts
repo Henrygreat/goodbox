@@ -245,6 +245,36 @@ export const importsApi = {
 
   downloadTemplate: () =>
     api.get('/imports/template', { responseType: 'blob' })
+};export type ServiceType = "sunday" | "wednesday";
+
+export type RotaRole =
+  | "opening_prayer"
+  | "rhapsody_reading"
+  | "closing_announcements";
+
+export type RotaAssignmentPayload = {
+  role: RotaRole;
+  user_id?: number;   // optional (if you select a user)
+  name?: string;      // optional (if you type a name)
 };
 
+export type RotaPayload = {
+  service_date: string;
+  service_type: ServiceType;
+  notes?: string;
+  assignments: RotaAssignmentPayload[];
+};
+
+export const rotaApi = {
+  getAll: (params?: { service_type?: ServiceType; from?: string; to?: string }) =>
+    api.get("/rota", { params }),
+
+  getOne: (id: number) => api.get(`/rota/${id}`),
+
+  create: (data: RotaPayload) => api.post("/rota", data),
+
+  update: (id: number, data: Partial<RotaPayload>) => api.put(`/rota/${id}`, data),
+
+  delete: (id: number) => api.delete(`/rota/${id}`),
+};
 export default api;
