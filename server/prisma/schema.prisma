@@ -82,24 +82,21 @@ model User {
   role         UserRole
   createdAt    DateTime @default(now()) @map("created_at")
 
-  // ✅ reverse side of Member.user
-  member        Member?
-
   // Relations
-  ledCellGroups        CellGroup[]          @relation("CellGroupLeader")
-  assignedMembers      Member[]             @relation("AssignedLeader")
+  ledCellGroups        CellGroup[]       @relation("CellGroupLeader")
+  assignedMembers      Member[]          @relation("AssignedLeader")
   followUps            FollowUp[]
   notifications        Notification[]
-  requestedApprovals   PendingApproval[]    @relation("RequestedBy")
-  reviewedApprovals    PendingApproval[]    @relation("ReviewedBy")
+  requestedApprovals   PendingApproval[] @relation("RequestedBy")
+  reviewedApprovals    PendingApproval[] @relation("ReviewedBy")
 
   // V2
   passwordResetTokens  PasswordResetToken[]
   imports              Import[]
 
   // Rota
-  createdRotas         Rota[]               @relation("RotaCreatedBy")
-  rotaAssignments      RotaAssignment[]     @relation("RotaAssignmentUser")
+  createdRotas         Rota[]            @relation("RotaCreatedBy")
+  rotaAssignments      RotaAssignment[]  @relation("RotaAssignmentUser")
 
   @@map("users")
 }
@@ -138,10 +135,6 @@ model Member {
   notes                     String?
   createdAt                 DateTime            @default(now()) @map("created_at")
   updatedAt                 DateTime            @updatedAt @map("updated_at")
-
-  // ✅ LINK MEMBER -> USER (optional)
-  userId Int?   @unique @map("user_id")
-  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   // Relations
   cellGroup        CellGroup?        @relation(fields: [cellGroupId], references: [id], onDelete: SetNull)
