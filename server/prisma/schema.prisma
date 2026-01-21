@@ -59,7 +59,7 @@ enum MemberJourneyStatus {
 
 //
 // ===============================
-// Rota
+// Rota (NEW)
 // ===============================
 //
 enum RotaServiceType {
@@ -82,24 +82,24 @@ model User {
   role         UserRole
   createdAt    DateTime @default(now()) @map("created_at")
 
-  // ✅ Member profile linked to this user (FK lives on Member.userId)
-  memberProfile Member?
+  // ✅ reverse side of Member.user
+  member        Member?
 
   // Relations
-  ledCellGroups      CellGroup[]       @relation("CellGroupLeader")
-  assignedMembers    Member[]          @relation("AssignedLeader")
-  followUps          FollowUp[]
-  notifications      Notification[]
-  requestedApprovals PendingApproval[] @relation("RequestedBy")
-  reviewedApprovals  PendingApproval[] @relation("ReviewedBy")
+  ledCellGroups        CellGroup[]          @relation("CellGroupLeader")
+  assignedMembers      Member[]             @relation("AssignedLeader")
+  followUps            FollowUp[]
+  notifications        Notification[]
+  requestedApprovals   PendingApproval[]    @relation("RequestedBy")
+  reviewedApprovals    PendingApproval[]    @relation("ReviewedBy")
 
   // V2
-  passwordResetTokens PasswordResetToken[]
-  imports             Import[]
+  passwordResetTokens  PasswordResetToken[]
+  imports              Import[]
 
   // Rota
-  createdRotas    Rota[]           @relation("RotaCreatedBy")
-  rotaAssignments RotaAssignment[] @relation("RotaAssignmentUser")
+  createdRotas         Rota[]               @relation("RotaCreatedBy")
+  rotaAssignments      RotaAssignment[]     @relation("RotaAssignmentUser")
 
   @@map("users")
 }
@@ -111,6 +111,7 @@ model CellGroup {
   leaderId    Int?     @map("leader_id")
   createdAt   DateTime @default(now()) @map("created_at")
 
+  // Relations
   leader  User?    @relation("CellGroupLeader", fields: [leaderId], references: [id], onDelete: SetNull)
   members Member[]
 
@@ -138,13 +139,13 @@ model Member {
   createdAt                 DateTime            @default(now()) @map("created_at")
   updatedAt                 DateTime            @updatedAt @map("updated_at")
 
-  // ✅ FK lives here -> members.user_id
-  userId Int?  @unique @map("user_id")
-  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  // ✅ LINK MEMBER -> USER (optional)
+  userId Int?   @unique @map("user_id")
+  user   User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  cellGroup      CellGroup? @relation(fields: [cellGroupId], references: [id], onDelete: SetNull)
-  assignedLeader User?      @relation("AssignedLeader", fields: [assignedLeaderId], references: [id], onDelete: SetNull)
-
+  // Relations
+  cellGroup        CellGroup?        @relation(fields: [cellGroupId], references: [id], onDelete: SetNull)
+  assignedLeader   User?             @relation("AssignedLeader", fields: [assignedLeaderId], references: [id], onDelete: SetNull)
   followUps        FollowUp[]
   attendance       Attendance[]
   pendingApprovals PendingApproval[]
@@ -163,6 +164,7 @@ model FollowUp {
   followUpDate DateTime   @map("follow_up_date")
   createdAt    DateTime   @default(now()) @map("created_at")
 
+  // Relations
   member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
   leader User   @relation(fields: [leaderId], references: [id], onDelete: Cascade)
 
@@ -179,6 +181,7 @@ model Attendance {
   attended    Boolean     @default(true)
   createdAt   DateTime    @default(now()) @map("created_at")
 
+  // Relations
   member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@unique([memberId, serviceDate, serviceType])
@@ -195,6 +198,7 @@ model Notification {
   read      Boolean          @default(false)
   createdAt DateTime         @default(now()) @map("created_at")
 
+  // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -210,6 +214,7 @@ model PendingApproval {
   reviewedAt  DateTime?      @map("reviewed_at")
   createdAt   DateTime       @default(now()) @map("created_at")
 
+  // Relations
   member    Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
   requester User   @relation("RequestedBy", fields: [requestedBy], references: [id], onDelete: Cascade)
   reviewer  User?  @relation("ReviewedBy", fields: [reviewedBy], references: [id], onDelete: SetNull)
@@ -220,6 +225,11 @@ model PendingApproval {
   @@map("pending_approvals")
 }
 
+//
+// ===============================
+// V2 Models - Password Reset & Import
+// ===============================
+//
 model PasswordResetToken {
   id        Int       @id @default(autoincrement())
   userId    Int       @map("user_id")
@@ -228,6 +238,7 @@ model PasswordResetToken {
   usedAt    DateTime? @map("used_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
+  // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
@@ -256,6 +267,7 @@ model Import {
   createdAt DateTime     @default(now()) @map("created_at")
   updatedAt DateTime     @updatedAt @map("updated_at")
 
+  // Relations
   creator User @relation(fields: [createdBy], references: [id], onDelete: Cascade)
 
   @@index([createdBy])
@@ -263,6 +275,11 @@ model Import {
   @@map("imports")
 }
 
+//
+// ===============================
+// Rota Models (NEW)
+// ===============================
+//
 model Rota {
   id          Int             @id @default(autoincrement())
   serviceDate DateTime        @map("service_date")
